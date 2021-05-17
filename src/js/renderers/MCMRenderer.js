@@ -109,6 +109,7 @@ class MCMRenderer extends AbstractRenderer {
         gl.uniform1ui(program.uniforms.uMaxBounces, this.maxBounces);
         gl.uniform1ui(program.uniforms.uSteps, this.steps);
         gl.uniform3fv(program.uniforms.uBaseColor, this._baseColor);
+        gl.uniform3fv(program.uniforms.uLight, this._light);
     
         gl.drawBuffers([
             gl.COLOR_ATTACHMENT0,

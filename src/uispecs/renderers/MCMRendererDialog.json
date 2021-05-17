@@ -60,6 +60,17 @@
     },
     {
       "type": "field",
+      "label": "Light direction:",
+      "children": [
+        {
+          "type": "vector",
+          "bind": "direction",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "type": "field",
       "label": "Isovalue:",
       "children": [
         {

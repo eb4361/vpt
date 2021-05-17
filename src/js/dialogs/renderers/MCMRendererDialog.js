@@ -17,6 +17,7 @@ class MCMRendererDialog extends AbstractDialog {
     
         this._binds.extinction.addEventListener('input', this._handleChange);
         this._binds.baseColor.addEventListener('change', this._handleChange);
+        this._binds.direction.addEventListener('input', this._handleChange);
         this._binds.metallic.addEventListener('input', this._handleChange);
         this._binds.roughness.addEventListener('input', this._handleChange);
         this._binds.isovalue.addEventListener('change', this._handleChange);
@@ -39,6 +40,7 @@ class MCMRendererDialog extends AbstractDialog {
     _handleChange() {
         const extinction = this._binds.extinction.getValue();
         const baseColor  = CommonUtils.hex2rgb(this._binds.baseColor.getValue());
+        const direction = this._binds.direction.getValue();
         const metallic   = this._binds.metallic.getValue();
         const roughness  = this._binds.roughness.getValue();
         const isovalue   = this._binds.isovalue.getValue();
@@ -60,10 +62,13 @@ class MCMRendererDialog extends AbstractDialog {
         this._renderer._baseColor[2] = baseColor.b;
         this._renderer.metallic = metallic;
         this._renderer.roughness = roughness;
+        this._renderer._light[0] = direction.x;
+        this._renderer._light[1] = direction.y;
+        this._renderer._light[2] = direction.z;
     
-        console.log("baseColorR: " + baseColor.r);
-        console.log("baseColorR: " + baseColor.g);
-        console.log("baseColorR: " + baseColor.b);
+        console.log("baseColorR: " + direction.x);
+        console.log("baseColorR: " + direction.y);
+        console.log("baseColorR: " + direction.z);
         console.log("metallic: " + metallic);
         console.log("roughness: " + roughness);
     

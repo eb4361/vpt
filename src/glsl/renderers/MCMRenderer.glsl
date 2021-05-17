@@ -59,6 +59,7 @@ uniform uint uMaxBounces;
 uniform uint uSteps;
 uniform float uIsovalue;
 uniform vec3 uBaseColor;
+uniform vec3 uLight;
 uniform float uMetallic;
 uniform float uRoughness;
 
