@@ -57,6 +57,10 @@ uniform float uScatteringBias;
 uniform float uMajorant;
 uniform uint uMaxBounces;
 uniform uint uSteps;
+uniform float uIsovalue;
+uniform vec3 uBaseColor;
+uniform float uMetallic;
+uniform float uRoughness;
 
 in vec2 vPosition;
 

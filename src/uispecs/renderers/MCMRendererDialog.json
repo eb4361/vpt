@@ -21,6 +21,59 @@
     },
     {
       "type": "field",
+      "label": "Base Color:",
+      "children": [
+        {
+          "type": "color-chooser",
+          "bind": "baseColor",
+          "value": "#ddeeff"
+        }
+      ]
+    },
+    {
+      "type": "field",
+      "label": "Metallic:",
+      "children": [
+        {
+          "type": "spinner",
+          "bind": "metallic",
+          "logarithmic": true,
+          "value": 1,
+          "min": 0,
+          "step": 0.1
+        }
+      ]
+    },
+    {
+      "type": "field",
+      "label": "Roughness:",
+      "children": [
+        {
+          "type": "spinner",
+          "bind": "roughness",
+          "logarithmic": true,
+          "value": 1,
+          "min": 0,
+          "step": 0.1
+        }
+      ]
+    },
+    {
+      "type": "field",
+      "label": "Isovalue:",
+      "children": [
+        {
+          "type": "slider",
+          "bind": "isovalue",
+          "value": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.1
+        }
+      ]
+    },
+    {
+      "type": "field",
       "label": "Scattering albedo:",
       "children": [
         {
