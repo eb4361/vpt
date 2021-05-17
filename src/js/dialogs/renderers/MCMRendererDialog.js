@@ -66,12 +66,6 @@ class MCMRendererDialog extends AbstractDialog {
         this._renderer._light[1] = direction.y;
         this._renderer._light[2] = direction.z;
     
-        console.log("baseColorR: " + direction.x);
-        console.log("baseColorR: " + direction.y);
-        console.log("baseColorR: " + direction.z);
-        console.log("metallic: " + metallic);
-        console.log("roughness: " + roughness);
-    
         this._renderer.reset();
     }
     

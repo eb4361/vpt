@@ -33,6 +33,7 @@ precision mediump float;
 
 #define M_INVPI 0.31830988618
 #define M_2PI 6.28318530718
+#define M_PI 3.1415926535897932384626433832795
 #define EPS 1e-5
 
 @Photon
@@ -135,43 +136,71 @@ void main() {
     for (uint i = 0u; i < uSteps; i++) {
         r = rand(r);
         float t = -log(r.x) / uMajorant;
+        vec3 firstPosition = photon.position;
         photon.position += t * photon.direction;
+        vec3 secondPosition = photon.position;
 
-        vec4 volumeSample = sampleVolumeColor(photon.position);
-        float muAbsorption = volumeSample.a * uAbsorptionCoefficient;
-        float muScattering = volumeSample.a * uScatteringCoefficient;
-        float muNull = uMajorant - muAbsorption - muScattering;
-        float muMajorant = muAbsorption + muScattering + abs(muNull);
-        float PNull = abs(muNull) / muMajorant;
-        float PAbsorption = muAbsorption / muMajorant;
-        float PScattering = muScattering / muMajorant;
+        float value = texture(uVolume, photon.position).r;
 
-        if (any(greaterThan(photon.position, vec3(1))) || any(lessThan(photon.position, vec3(0)))) {
-            // out of bounds
-            vec4 envSample = sampleEnvironmentMap(photon.direction);
-            vec3 radiance = photon.transmittance * envSample.rgb;
-            photon.samples++;
-            photon.radiance += (radiance - photon.radiance) / float(photon.samples);
-            resetPhoton(r, photon);
-        } else if (photon.bounces >= uMaxBounces) {
-            // max bounces achieved -> only estimate transmittance
-            float weightAS = (muAbsorption + muScattering) / uMajorant;
-            photon.transmittance *= 1.0 - weightAS;
-        } else if (r.y < PAbsorption) {
-            // absorption
-            float weightA = muAbsorption / (uMajorant * PAbsorption);
-            photon.transmittance *= 1.0 - weightA;
-        } else if (r.y < PAbsorption + PScattering) {
-            // scattering
-            r = rand(r);
-            float weightS = muScattering / (uMajorant * PScattering);
-            photon.transmittance *= volumeSample.rgb * weightS;
-            photon.direction = sampleHenyeyGreenstein(uScatteringBias, r, photon.direction);
-            photon.bounces++;
-        } else {
-            // null collision
-            float weightN = muNull / (uMajorant * PNull);
-            photon.transmittance *= weightN;
+        float firstTexturePosition = texture(uVolume, firstPosition).r;
+        float secondTexturePosition = texture(uVolume, secondPosition).r;
+
+        if(value >= uIsovalue){
+            // B-sekcija
+            if(firstTexturePosition * secondTexturePosition >= 0.0f){
+                // If this happens then there is a mistake
+            }
+
+            // 20 is  the limit so that we don't take too much time solving
+            for (int i = 0; i < 20; i++) {
+
+                vec3 middlePoint = (firstPosition + secondPosition) / 2.0f;
+                float middlePointTexture = texture(uVolume, middlePoint).r;
+
+                if (middlePointTexture * firstTexturePosition >= 0.0f) firstPosition = middlePoint;
+                else secondPosition = middlePoint;
+            }
+            // BRDF
+
+            
+        }
+        else{
+            vec4 volumeSample = sampleVolumeColor(photon.position);
+            float muAbsorption = volumeSample.a * uAbsorptionCoefficient;
+            float muScattering = volumeSample.a * uScatteringCoefficient;
+            float muNull = uMajorant - muAbsorption - muScattering;
+            float muMajorant = muAbsorption + muScattering + abs(muNull);
+            float PNull = abs(muNull) / muMajorant;
+            float PAbsorption = muAbsorption / muMajorant;
+            float PScattering = muScattering / muMajorant;
+
+            if (any(greaterThan(photon.position, vec3(1))) || any(lessThan(photon.position, vec3(0)))) {
+                // out of bounds
+                vec4 envSample = sampleEnvironmentMap(photon.direction);
+                vec3 radiance = photon.transmittance * envSample.rgb;
+                photon.samples++;
+                photon.radiance += (radiance - photon.radiance) / float(photon.samples);
+                resetPhoton(r, photon);
+            } else if (photon.bounces >= uMaxBounces) {
+                // max bounces achieved -> only estimate transmittance
+                float weightAS = (muAbsorption + muScattering) / uMajorant;
+                photon.transmittance *= 1.0 - weightAS;
+            } else if (r.y < PAbsorption) {
+                // absorption
+                float weightA = muAbsorption / (uMajorant * PAbsorption);
+                photon.transmittance *= 1.0 - weightA;
+            } else if (r.y < PAbsorption + PScattering) {
+                // scattering
+                r = rand(r);
+                float weightS = muScattering / (uMajorant * PScattering);
+                photon.transmittance *= volumeSample.rgb * weightS;
+                photon.direction = sampleHenyeyGreenstein(uScatteringBias, r, photon.direction);
+                photon.bounces++;
+            } else {
+                // null collision
+                float weightN = muNull / (uMajorant * PNull);
+                photon.transmittance *= weightN;
+            }
         }
     }
 
