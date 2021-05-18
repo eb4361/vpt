@@ -120,6 +120,20 @@ vec3 sampleHenyeyGreenstein(float g, vec2 U, vec3 direction) {
     return normalize(u + lambda * direction);
 }
 
+vec3 gradient(vec3 pos, float h) {
+    vec3 positive = vec3(
+        texture(uVolume, pos + vec3( h, 0.0, 0.0)).r,
+        texture(uVolume, pos + vec3(0.0,  h, 0.0)).r,
+        texture(uVolume, pos + vec3(0.0, 0.0,  h)).r
+    );
+    vec3 negative = vec3(
+        texture(uVolume, pos + vec3(-h, 0.0, 0.0)).r,
+        texture(uVolume, pos + vec3(0.0, -h, 0.0)).r,
+        texture(uVolume, pos + vec3(0.0, 0.0, -h)).r
+    );
+    return normalize(positive - negative);
+}
+
 void main() {
     Photon photon;
     vec2 mappedPosition = vPosition * 0.5 + 0.5;
@@ -151,18 +165,33 @@ void main() {
                 // If this happens then there is a mistake
             }
 
+            vec3 middlePoint = firstPosition;
             // 20 is  the limit so that we don't take too much time solving
             for (int i = 0; i < 20; i++) {
 
-                vec3 middlePoint = (firstPosition + secondPosition) / 2.0f;
+                middlePoint = (firstPosition + secondPosition) / 2.0f;
                 float middlePointTexture = texture(uVolume, middlePoint).r;
 
                 if (middlePointTexture * firstTexturePosition >= 0.0f) firstPosition = middlePoint;
                 else secondPosition = middlePoint;
             }
             // BRDF
+            vec3 lightVector = normalize(uLight);
+            vec3 viewVector = normalize(photon.direction);
+            vec3 halfVector = normalize(lightVector + viewVector);
+            vec3 normal = normalize(gradient(middlePoint.xyz, 0.005));
 
-            
+            // BRDF diffuse
+            vec3 dielectric = vec3(0.04, 0.04, 0.04);
+            vec3 colorBlack = vec3(0,0,0);
+            vec3 cdiff = mix(uBaseColor * (1.0f-dielectric.r), colorBlack, uMetallic);
+            vec3 diff = cdiff / M_PI;
+
+            // BRDF Specular
+            // Specular F
+            vec3 F0 = mix(dielectric, uBaseColor, uMetallic);
+            vec3 F = F0 + (1.0f-F0) * (pow(1.0f - dot(viewVector, halfVector), 5.0f));
+
         }
         else{
             vec4 volumeSample = sampleVolumeColor(photon.position);
