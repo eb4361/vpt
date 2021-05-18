@@ -134,6 +134,10 @@ vec3 gradient(vec3 pos, float h) {
     return normalize(positive - negative);
 }
 
+vec3 geometricOclusion(vec3 normal, vec3 viewVector, float alfa){
+    return (normal * viewVector) + sqrt(pow(alfa, 2.0f) + (1.0f - pow(alfa, 2.0f) * pow(dot(normal,viewVector), 2.0f)));
+}
+
 void main() {
     Photon photon;
     vec2 mappedPosition = vPosition * 0.5 + 0.5;
@@ -191,6 +195,13 @@ void main() {
             // Specular F
             vec3 F0 = mix(dielectric, uBaseColor, uMetallic);
             vec3 F = F0 + (1.0f-F0) * (pow(1.0f - dot(viewVector, halfVector), 5.0f));
+
+            // Specular G
+            float alfa = pow(uRoughness, 2.0f);
+            vec3 G1 = (2.0f * dot(normal, lightVector)) / geometricOclusion(normal, lightVector, alfa);
+            vec3 G2 = (2.0f * dot(normal, viewVector)) / geometricOclusion(normal, viewVector, alfa);
+            vec3 G = G1 * G2;
+
 
         }
         else{
