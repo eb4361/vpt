@@ -202,6 +202,14 @@ void main() {
             vec3 G2 = (2.0f * dot(normal, viewVector)) / geometricOclusion(normal, viewVector, alfa);
             vec3 G = G1 * G2;
 
+            // Specular D
+            float belowD = M_PI * pow(pow(dot(viewVector, halfVector), 2.0f) * (alfa - 1.0f) + 1.0f, 2.0f);
+            float D = pow(alfa, 2.0f) / belowD;
+
+            // Specular final
+            float belowSpec = 4.0f * dot(normal, lightVector) * dot(normal, viewVector);
+            vec3 BRDF = F * G * D / belowSpec;
+
 
         }
         else{
