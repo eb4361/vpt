@@ -182,17 +182,21 @@ void main() {
             if(texture(uVolume, firstPosition).r * secondTexturePosition >= 0.0f){
                 // If this happens then there is a mistake
             }
-
             vec3 middlePoint = firstPosition;
-            // 20 is  the limit so that we don't take too much time solving
-            for (int i = 0; i < 20; i++) {
 
-                middlePoint = (firstPosition + secondPosition) / 2.0f;
-                float middlePointTexture = texture(uVolume, middlePoint).r;
+            if(value == uIsovalue) middlePoint = photon.position;
+            else{
+                // 20 is  the limit so that we don't take too much time solving
+                for (int i = 0; i < 20; i++) {
 
-                if (middlePointTexture * texture(uVolume, firstPosition).r >= 0.0f) firstPosition = middlePoint;
-                else secondPosition = middlePoint;
+                    middlePoint = (firstPosition + secondPosition) / 2.0f;
+                    float middlePointTexture = texture(uVolume, middlePoint).r;
+
+                    if (middlePointTexture * texture(uVolume, firstPosition).r >= 0.0f) firstPosition = middlePoint;
+                    else secondPosition = middlePoint;
+                }
             }
+            
             // BRDF
             vec3 lightVector = normalize(uLight);
             vec3 viewVector = normalize(photon.direction);
