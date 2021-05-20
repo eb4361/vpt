@@ -138,6 +138,21 @@ vec3 geometricOclusion(vec3 normal, vec3 viewVector, float alfa){
     return (normal * viewVector) + sqrt(pow(alfa, 2.0f) + (1.0f - pow(alfa, 2.0f) * pow(dot(normal,viewVector), 2.0f)));
 }
 
+vec3 importanceSampleGgxD(vec2 seed, float rough2, vec3 N)
+{
+    float phi = 2.0 * M_PI * seed.x;
+    float cosTheta = sqrt((1.0f - seed.y) / (1.0f + (rough2*rough2 - 1.0f) * seed.y));
+    float sinTheta = sqrt(1.0f - cosTheta*cosTheta);
+    vec3 h;
+    h.x = sinTheta * cos(phi);
+    h.y = cosTheta;
+    h.z = sinTheta * sin(phi);
+    vec3 up = abs(N.y) < 0.999f ? vec3(0, 1, 0) : vec3(1, 0, 0);
+    vec3 tangentX = normalize(cross(up, N));
+    vec3 tangentZ = cross(tangentX, N);
+    return h.x * tangentX + h.y * N + h.z * tangentZ;
+}
+
 void main() {
     Photon photon;
     vec2 mappedPosition = vPosition * 0.5 + 0.5;
@@ -160,12 +175,11 @@ void main() {
 
         float value = texture(uVolume, photon.position).r;
 
-        float firstTexturePosition = texture(uVolume, firstPosition).r;
         float secondTexturePosition = texture(uVolume, secondPosition).r;
 
         if(value >= uIsovalue){
             // B-sekcija
-            if(firstTexturePosition * secondTexturePosition >= 0.0f){
+            if(texture(uVolume, firstPosition).r * secondTexturePosition >= 0.0f){
                 // If this happens then there is a mistake
             }
 
@@ -176,7 +190,7 @@ void main() {
                 middlePoint = (firstPosition + secondPosition) / 2.0f;
                 float middlePointTexture = texture(uVolume, middlePoint).r;
 
-                if (middlePointTexture * firstTexturePosition >= 0.0f) firstPosition = middlePoint;
+                if (middlePointTexture * texture(uVolume, firstPosition).r >= 0.0f) firstPosition = middlePoint;
                 else secondPosition = middlePoint;
             }
             // BRDF
@@ -188,12 +202,12 @@ void main() {
             // BRDF diffuse
             vec3 dielectric = vec3(0.04, 0.04, 0.04);
             vec3 colorBlack = vec3(0,0,0);
-            vec3 cdiff = mix(uBaseColor * (1.0f-dielectric.r), colorBlack, uMetallic);
+            vec3 cdiff = mix(uBaseColor.rgb * (1.0f-dielectric.r), colorBlack, uMetallic);
             vec3 diff = cdiff / M_PI;
 
             // BRDF Specular
             // Specular F
-            vec3 F0 = mix(dielectric, uBaseColor, uMetallic);
+            vec3 F0 = mix(dielectric, uBaseColor.rgb, uMetallic);
             vec3 F = F0 + (1.0f-F0) * (pow(1.0f - dot(viewVector, halfVector), 5.0f));
 
             // Specular G
@@ -203,12 +217,20 @@ void main() {
             vec3 G = G1 * G2;
 
             // Specular D
-            float belowD = M_PI * pow(pow(dot(viewVector, halfVector), 2.0f) * (alfa - 1.0f) + 1.0f, 2.0f);
+            float belowD = M_PI * pow(pow(dot(normal, halfVector), 2.0f) * (alfa - 1.0f) + 1.0f, 2.0f);
             float D = pow(alfa, 2.0f) / belowD;
 
             // Specular final
             float belowSpec = 4.0f * dot(normal, lightVector) * dot(normal, viewVector);
-            vec3 BRDF = F * G * D / belowSpec;
+            vec3 BRDFspec = F * G * D / belowSpec;
+            vec3 BRDF = BRDFspec + diff;
+
+            // sampling
+            photon.position = middlePoint;
+
+            photon.transmittance = photon.transmittance * BRDF;
+
+            photon.direction = importanceSampleGgxD(r, alfa, normal);
 
 
         }

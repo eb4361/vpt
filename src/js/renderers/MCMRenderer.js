@@ -17,7 +17,7 @@ class MCMRenderer extends AbstractRenderer {
             steps                 : 1,
             _isovalue             : 0.4,
             _light                : [0.5, 0.5, 0.5],
-            _baseColor            : [0.7, 0.8, 0.9],
+            _baseColor            : [0.3, 0.7, 0.5],
             _metallic             : 0.5,
             _roughness            : 0.5,
         }, options);
