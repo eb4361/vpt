@@ -134,13 +134,13 @@ vec3 gradient(vec3 pos, float h) {
     return normalize(positive - negative);
 }
 
-vec3 geometricOclusion(vec3 normal, vec3 viewVector, float alfa){
-    return (normal * viewVector) + sqrt(pow(alfa, 2.0f) + (1.0f - pow(alfa, 2.0f) * pow(dot(normal,viewVector), 2.0f)));
+float geometricOclusion(vec3 normal, vec3 viewVector, float alfa){
+    return dot(normal, viewVector) + sqrt(pow(alfa, 2.0f) + (1.0f - pow(alfa, 2.0f) * pow(dot(normal,viewVector), 2.0f)));
 }
 
 vec3 importanceSampleGgxD(vec2 seed, float rough2, vec3 N)
 {
-    float phi = 2.0 * M_PI * seed.x;
+    float phi = 2.0f * M_PI * seed.x;
     float cosTheta = sqrt((1.0f - seed.y) / (1.0f + (rough2*rough2 - 1.0f) * seed.y));
     float sinTheta = sqrt(1.0f - cosTheta*cosTheta);
     vec3 h;
@@ -208,13 +208,13 @@ void main() {
             // BRDF Specular
             // Specular F
             vec3 F0 = mix(dielectric, uBaseColor.rgb, uMetallic);
-            vec3 F = F0 + (1.0f-F0) * (pow(1.0f - dot(viewVector, halfVector), 5.0f));
+            vec3 F = F0 + (1.0f-F0) * (pow(1.0f - abs(dot(viewVector, halfVector)), 5.0f));
 
             // Specular G
             float alfa = pow(uRoughness, 2.0f);
-            vec3 G1 = (2.0f * dot(normal, lightVector)) / geometricOclusion(normal, lightVector, alfa);
-            vec3 G2 = (2.0f * dot(normal, viewVector)) / geometricOclusion(normal, viewVector, alfa);
-            vec3 G = G1 * G2;
+            float G1 = (2.0f * dot(normal, lightVector)) / geometricOclusion(normal, lightVector, alfa);
+            float G2 = (2.0f * dot(normal, viewVector)) / geometricOclusion(normal, viewVector, alfa);
+            float G = G1 * G2;
 
             // Specular D
             float belowD = M_PI * pow(pow(dot(normal, halfVector), 2.0f) * (alfa - 1.0f) + 1.0f, 2.0f);

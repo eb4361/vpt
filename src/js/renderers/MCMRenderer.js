@@ -15,11 +15,11 @@ class MCMRenderer extends AbstractRenderer {
             majorant              : 2,
             maxBounces            : 8,
             steps                 : 1,
-            _isovalue             : 0.4,
-            _light                : [0.5, 0.5, 0.5],
-            _baseColor            : [0.3, 0.7, 0.5],
-            _metallic             : 0.5,
-            _roughness            : 0.5,
+            isovalue             : 0.4,
+            light                : [0.5, 0.5, 0.5],
+            baseColor            : [0.3, 0.7, 0.5],
+            metallic             : 0.5,
+            roughness            : 0.5,
         }, options);
     
         this._programs = WebGL.buildPrograms(gl, {
@@ -103,13 +103,13 @@ class MCMRenderer extends AbstractRenderer {
         gl.uniform1f(program.uniforms.uScatteringCoefficient, this.scatteringCoefficient);
         gl.uniform1f(program.uniforms.uScatteringBias, this.scatteringBias);
         gl.uniform1f(program.uniforms.uMajorant, this.majorant);
-        gl.uniform1f(program.uniforms.uIsovalue, this._isovalue);
-        gl.uniform1f(program.uniforms.uMetallic, this._metallic);
-        gl.uniform1f(program.uniforms.uRoughness, this._roughness);
+        gl.uniform1f(program.uniforms.uIsovalue, this.isovalue);
+        gl.uniform1f(program.uniforms.uMetallic, this.metallic);
+        gl.uniform1f(program.uniforms.uRoughness, this.roughness);
         gl.uniform1ui(program.uniforms.uMaxBounces, this.maxBounces);
         gl.uniform1ui(program.uniforms.uSteps, this.steps);
-        gl.uniform3fv(program.uniforms.uBaseColor, this._baseColor);
-        gl.uniform3fv(program.uniforms.uLight, this._light);
+        gl.uniform3fv(program.uniforms.uBaseColor, this.baseColor);
+        gl.uniform3fv(program.uniforms.uLight, this.light);
     
         gl.drawBuffers([
             gl.COLOR_ATTACHMENT0,

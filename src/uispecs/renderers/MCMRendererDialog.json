@@ -64,7 +64,7 @@
       "children": [
         {
           "type": "vector",
-          "bind": "direction",
+          "bind": "light",
           "value": 1
         }
       ]

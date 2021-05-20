@@ -17,7 +17,7 @@ class MCMRendererDialog extends AbstractDialog {
     
         this._binds.extinction.addEventListener('input', this._handleChange);
         this._binds.baseColor.addEventListener('change', this._handleChange);
-        this._binds.direction.addEventListener('input', this._handleChange);
+        this._binds.light.addEventListener('input', this._handleChange);
         this._binds.metallic.addEventListener('input', this._handleChange);
         this._binds.roughness.addEventListener('input', this._handleChange);
         this._binds.isovalue.addEventListener('change', this._handleChange);
@@ -40,7 +40,7 @@ class MCMRendererDialog extends AbstractDialog {
     _handleChange() {
         const extinction = this._binds.extinction.getValue();
         const baseColor  = CommonUtils.hex2rgb(this._binds.baseColor.getValue());
-        const direction = this._binds.direction.getValue();
+        const light = this._binds.light.getValue();
         const metallic   = this._binds.metallic.getValue();
         const roughness  = this._binds.roughness.getValue();
         const isovalue   = this._binds.isovalue.getValue();
@@ -57,14 +57,14 @@ class MCMRendererDialog extends AbstractDialog {
         this._renderer.maxBounces = bounces;
         this._renderer.steps = steps;
         this._renderer.isovalue = isovalue;
-        this._renderer._baseColor[0] = baseColor.r;
-        this._renderer._baseColor[1] = baseColor.g;
-        this._renderer._baseColor[2] = baseColor.b;
+        this._renderer.baseColor[0] = baseColor.r;
+        this._renderer.baseColor[1] = baseColor.g;
+        this._renderer.baseColor[2] = baseColor.b;
         this._renderer.metallic = metallic;
         this._renderer.roughness = roughness;
-        this._renderer._light[0] = direction.x;
-        this._renderer._light[1] = direction.y;
-        this._renderer._light[2] = direction.z;
+        this._renderer.light[0] = light.x;
+        this._renderer.light[1] = light.y;
+        this._renderer.light[2] = light.z;
     
         this._renderer.reset();
     }
