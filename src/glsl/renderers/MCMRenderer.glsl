@@ -184,18 +184,16 @@ void main() {
                 // If this happens then there is a mistake
                 continue;
             }
+            if(value == uIsovalue) middlePoint = photon.position;
             else{
-                if(value == uIsovalue) middlePoint = photon.position;
-                else{
-                    // 20 is  the limit so that we don't take too much time solving
-                    for (int i = 0; i < 20; i++) {
+                // 20 is  the limit so that we don't take too much time solving
+                for (int i = 0; i < 20; i++) {
 
-                        middlePoint = (firstPosition + secondPosition) / 2.0f;
-                        float middlePointTexture = texture(uVolume, middlePoint).r;
+                    middlePoint = (firstPosition + secondPosition) / 2.0f;
+                    float middlePointTexture = texture(uVolume, middlePoint).r;
 
-                        if (middlePointTexture * texture(uVolume, firstPosition).r >= 0.0f) firstPosition = middlePoint;
-                        else secondPosition = middlePoint;
-                    }
+                    if (middlePointTexture * texture(uVolume, firstPosition).r >= 0.0f) firstPosition = middlePoint;
+                    else secondPosition = middlePoint;
                 }
             }
             
