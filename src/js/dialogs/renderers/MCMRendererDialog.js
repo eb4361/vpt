@@ -40,7 +40,7 @@ class MCMRendererDialog extends AbstractDialog {
     _handleChange() {
         const extinction = this._binds.extinction.getValue();
         const baseColor  = CommonUtils.hex2rgb(this._binds.baseColor.getValue());
-        const light = this._binds.light.getValue();
+        const light      = this._binds.light.getValue();
         const metallic   = this._binds.metallic.getValue();
         const roughness  = this._binds.roughness.getValue();
         const isovalue   = this._binds.isovalue.getValue();
